@@ -1,962 +1,629 @@
-/* =========================================
-   MATHS PLAYLAND
-   Interactive Maths Playground
-   For 1st - 3rd Standard
-========================================= */
-
-let score = 0;
-let currentActivity = "";
-
-
-/* ==============================
-   SCREEN CONTROL
-============================== */
-
-function hidePages() {
-    document.querySelectorAll(".page").forEach(page => {
-        page.classList.remove("active");
-    });
+* {
+    box-sizing: border-box;
 }
 
-function goHome() {
-    hidePages();
-    document.getElementById("home").classList.add("active");
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Trebuchet MS", "Comic Sans MS", sans-serif;
+    background: linear-gradient(135deg, #fff4c7, #dff7ff, #ffe5f0);
+    color: #333;
 }
 
-function showActivities() {
-    hidePages();
-    document.getElementById("activities").classList.add("active");
+button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
 }
 
-function showPlayground() {
-    hidePages();
-    document.getElementById("playground").classList.add("active");
+header {
+    height: 70px;
+    background: rgba(255,255,255,.95);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5%;
+    box-shadow: 0 3px 15px rgba(0,0,0,.1);
+    position: sticky;
+    top: 0;
+    z-index: 20;
 }
 
-
-/* ==============================
-   START ACTIVITY
-============================== */
-
-function startActivity(activity) {
-
-    currentActivity = activity;
-
-    score = 0;
-
-    document.getElementById("score").textContent = score;
-
-    showPlayground();
-
-    const area = document.getElementById("playArea");
-
-    area.innerHTML = "";
-
-    document.getElementById("message").textContent = "";
-
-    runActivity(activity);
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
 }
 
+header button {
+    background: #fff0a5;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-weight: bold;
+}
 
-/* ==============================
-   ACTIVITY SELECTOR
-============================== */
+.screen {
+    display: none;
+    min-height: calc(100vh - 70px);
+    padding: 35px 5%;
+}
 
-function runActivity(activity) {
+.screen.active {
+    display: block;
+    animation: appear .4s ease;
+}
 
-    switch(activity) {
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
 
-        case "chocolate":
-            chocolateCollector();
-            break;
-
-        case "apple":
-            appleBasket();
-            break;
-
-        case "balloon":
-            balloonPop();
-            break;
-
-        case "cookie":
-            cookieMonster();
-            break;
-
-        case "groups":
-            equalGroups();
-            break;
-
-        case "pizza":
-            pizzaMaker();
-            break;
-
-        case "sharing":
-            fairSharing();
-            break;
-
-        case "bunny":
-            bunnyCarrots();
-            break;
-
-        case "numberline":
-            numberLine();
-            break;
-
-        case "fishing":
-            numberFishing();
-            break;
-
-        case "pattern":
-            patternTrain();
-            break;
-
-        case "sorting":
-            sortingGame();
-            break;
-
-        case "scale":
-            balanceScale();
-            break;
-
-        case "blocks":
-            buildNumber();
-            break;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
+/* HOME */
 
-/* ==============================
-   1. CHOCOLATE COLLECTOR
-============================== */
+.hero {
+    max-width: 1000px;
+    margin: 70px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 60px;
+    text-align: center;
+}
 
-function chocolateCollector() {
+.hero-girl {
+    font-size: 9rem;
+    animation: jump 2s infinite;
+}
 
-    const a = random(2,5);
-    const b = random(2,5);
-
-    document.getElementById("activityTitle").textContent =
-        "🍫 Chocolate Collector";
-
-    document.getElementById("instruction").textContent =
-        `Help the girl collect ${a} chocolates first!`;
-
-    const area = document.getElementById("playArea");
-
-    area.innerHTML = `
-        <div style="text-align:center;font-size:6rem">👧</div>
-
-        <div class="object-row" id="chocolates"></div>
-
-        <div class="basket" id="basket">
-            🧺
-        </div>
-
-        <p style="text-align:center;font-size:1.2rem">
-            🍫 Collected: <span id="count">0</span>
-        </p>
-    `;
-
-    const container = document.getElementById("chocolates");
-
-    for(let i=0;i<a;i++) {
-
-        const chocolate = document.createElement("div");
-
-        chocolate.className = "object";
-
-        chocolate.textContent = "🍫";
-
-        chocolate.draggable = true;
-
-        chocolate.addEventListener("dragstart", e => {
-            e.dataTransfer.setData("text", chocolate.id);
-        });
-
-        chocolate.id = "choco" + i;
-
-        container.appendChild(chocolate);
+@keyframes jump {
+    0%,100% {
+        transform: translateY(0);
     }
 
-    const basket = document.getElementById("basket");
-
-    basket.addEventListener("dragover", e => {
-        e.preventDefault();
-        basket.classList.add("drag-over");
-    });
-
-    basket.addEventListener("dragleave", () => {
-        basket.classList.remove("drag-over");
-    });
-
-    basket.addEventListener("drop", e => {
-
-        e.preventDefault();
-
-        basket.classList.remove("drag-over");
-
-        const id = e.dataTransfer.getData("text");
-
-        const item = document.getElementById(id);
-
-        if(item) {
-
-            item.classList.add("collected");
-
-            setTimeout(() => item.remove(),400);
-
-            const count =
-                document.getElementById("count");
-
-            count.textContent =
-                Number(count.textContent) + 1;
-
-            if(Number(count.textContent) === a) {
-
-                setTimeout(() => {
-
-                    additionSecondRound(b);
-
-                },600);
-            }
-        }
-    });
-}
-
-
-function additionSecondRound(b) {
-
-    document.getElementById("instruction").textContent =
-        `Great! 🎉 Now collect ${b} more chocolates!`;
-
-    const container =
-        document.getElementById("chocolates");
-
-    for(let i=0;i<b;i++) {
-
-        const chocolate =
-            document.createElement("div");
-
-        chocolate.className = "object";
-
-        chocolate.textContent = "🍫";
-
-        chocolate.draggable = true;
-
-        chocolate.id =
-            "extra" + i;
-
-        chocolate.addEventListener("dragstart", e => {
-            e.dataTransfer.setData("text", chocolate.id);
-        });
-
-        container.appendChild(chocolate);
-    }
-
-    const basket =
-        document.getElementById("basket");
-
-    basket.ondrop = function(e) {
-
-        e.preventDefault();
-
-        const id =
-            e.dataTransfer.getData("text");
-
-        const item =
-            document.getElementById(id);
-
-        if(item) {
-
-            item.classList.add("collected");
-
-            setTimeout(() => item.remove(),400);
-
-            const count =
-                document.getElementById("count");
-
-            count.textContent =
-                Number(count.textContent) + 1;
-
-            if(Number(count.textContent) ===
-               document.querySelectorAll(".object").length + Number(count.textContent)) {
-            }
-
-            const remaining =
-                document.querySelectorAll(".object").length;
-
-            if(remaining === 0) {
-
-                celebrate(
-                    `🍫 Amazing! You collected ${Number(count.textContent)} chocolates!`
-                );
-
-                score += 10;
-
-                updateScore();
-            }
-        }
-    };
-}
-
-
-/* ==============================
-   2. APPLE BASKET
-============================== */
-
-function appleBasket() {
-
-    const apples = random(5,9);
-
-    document.getElementById("activityTitle").textContent =
-        "🍎 Apple Basket";
-
-    document.getElementById("instruction").textContent =
-        `Drag all ${apples} apples into the basket!`;
-
-    const area =
-        document.getElementById("playArea");
-
-    area.innerHTML = `
-        <div style="text-align:center;font-size:6rem">
-            🌳
-        </div>
-
-        <div class="object-row" id="appleObjects"></div>
-
-        <div class="basket" id="appleBasket">
-            🧺
-        </div>
-
-        <p style="text-align:center">
-            Apples collected:
-            <b id="appleCount">0</b>
-        </p>
-    `;
-
-    const objects =
-        document.getElementById("appleObjects");
-
-    for(let i=0;i<apples;i++) {
-
-        const apple =
-            document.createElement("div");
-
-        apple.className = "object";
-
-        apple.textContent = "🍎";
-
-        apple.draggable = true;
-
-        apple.id = "apple" + i;
-
-        apple.addEventListener("dragstart", e => {
-            e.dataTransfer.setData("text", apple.id);
-        });
-
-        objects.appendChild(apple);
-    }
-
-    setupBasket(
-        "appleBasket",
-        "appleCount",
-        apples,
-        "🍎"
-    );
-}
-
-
-/* ==============================
-   GENERIC BASKET
-============================== */
-
-function setupBasket(
-    basketId,
-    countId,
-    total,
-    emoji
-) {
-
-    const basket =
-        document.getElementById(basketId);
-
-    basket.addEventListener("dragover", e => {
-        e.preventDefault();
-        basket.classList.add("drag-over");
-    });
-
-    basket.addEventListener("dragleave", () => {
-        basket.classList.remove("drag-over");
-    });
-
-    basket.addEventListener("drop", e => {
-
-        e.preventDefault();
-
-        basket.classList.remove("drag-over");
-
-        const id =
-            e.dataTransfer.getData("text");
-
-        const item =
-            document.getElementById(id);
-
-        if(!item) return;
-
-        item.remove();
-
-        const count =
-            document.getElementById(countId);
-
-        count.textContent =
-            Number(count.textContent) + 1;
-
-        if(Number(count.textContent) === total) {
-
-            celebrate(
-                `${emoji} You collected all ${total} objects!`
-            );
-
-            score += 10;
-
-            updateScore();
-        }
-    });
-}
-
-
-/* ==============================
-   3. BALLOON POP
-============================== */
-
-function balloonPop() {
-
-    const total = random(6,10);
-
-    const remove = random(2,4);
-
-    document.getElementById("activityTitle").textContent =
-        "🎈 Balloon Pop";
-
-    document.getElementById("instruction").textContent =
-        `There are ${total} balloons! Pop ${remove} balloons.`;
-
-    const area =
-        document.getElementById("playArea");
-
-    area.innerHTML = `
-        <div class="balloon-area" id="balloonArea"></div>
-
-        <h2 style="text-align:center">
-            🎈 Balloons left:
-            <span id="balloonCount">${total}</span>
-        </h2>
-    `;
-
-    const balloonArea =
-        document.getElementById("balloonArea");
-
-    for(let i=0;i<total;i++) {
-
-        const balloon =
-            document.createElement("div");
-
-        balloon.className = "balloon";
-
-        balloon.textContent =
-            ["🎈","🎈","🎈","🎈"][i % 4];
-
-        balloon.onclick = function() {
-
-            if(balloon.classList.contains("pop"))
-                return;
-
-            balloon.classList.add("pop");
-
-            setTimeout(() => {
-                balloon.remove();
-
-                const count =
-                    document.getElementById("balloonCount");
-
-                count.textContent =
-                    Number(count.textContent) - 1;
-
-                const popped =
-                    total -
-                    Number(count.textContent);
-
-                if(popped === remove) {
-
-                    celebrate(
-                        `🎈 Great! ${Number(count.textContent)} balloons are left!`
-                    );
-
-                    score += 10;
-
-                    updateScore();
-                }
-            },300);
-        };
-
-        balloonArea.appendChild(balloon);
+    50% {
+        transform: translateY(-20px);
     }
 }
 
+.hero h1 {
+    font-size: clamp(2.3rem, 6vw, 4.5rem);
+    margin-bottom: 10px;
+}
 
-/* ==============================
-   4. COOKIE MONSTER
-============================== */
+.hero p {
+    font-size: 1.25rem;
+}
 
-function cookieMonster() {
+.big-btn {
+    margin-top: 20px;
+    background: #ff765c;
+    color: white;
+    padding: 18px 32px;
+    border-radius: 35px;
+    font-size: 1.15rem;
+    font-weight: bold;
+    box-shadow: 0 6px 0 #d9573c;
+}
 
-    const total = 10;
-    const eat = random(2,5);
+.big-btn:active {
+    transform: translateY(5px);
+    box-shadow: 0 1px 0 #d9573c;
+}
 
-    document.getElementById("activityTitle").textContent =
-        "🍪 Cookie Monster";
+.features {
+    max-width: 800px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 18px;
+}
 
-    document.getElementById("instruction").textContent =
-        `The monster has ${total} cookies. Click ${eat} cookies to feed him!`;
+.features div {
+    background: white;
+    padding: 22px;
+    text-align: center;
+    border-radius: 25px;
+    font-size: 2rem;
+    box-shadow: 0 7px 18px rgba(0,0,0,.1);
+}
 
-    const area =
-        document.getElementById("playArea");
+/* GAMES */
 
-    area.innerHTML = `
-        <div style="text-align:center;font-size:7rem">
-            😋
-        </div>
+#activities h2,
+#activities .subtitle {
+    text-align: center;
+}
 
-        <div class="object-row" id="cookies"></div>
+#activities h2 {
+    font-size: 2.4rem;
+}
 
-        <h2>
-            Cookies left:
-            <span id="cookieCount">${total}</span>
-        </h2>
-    `;
+.games {
+    max-width: 1050px;
+    margin: 30px auto;
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 20px;
+}
 
-    const cookies =
-        document.getElementById("cookies");
+.game-card {
+    min-height: 170px;
+    background: white;
+    border-radius: 25px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 3rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,.1);
+    transition: .25s;
+}
 
-    for(let i=0;i<total;i++) {
+.game-card:hover {
+    transform: translateY(-8px) rotate(1deg);
+    box-shadow: 0 15px 25px rgba(0,0,0,.15);
+}
 
-        const cookie =
-            document.createElement("div");
+.game-card b {
+    font-size: 1.05rem;
+}
 
-        cookie.className = "object";
+.game-card small {
+    font-size: .85rem;
+    opacity: .6;
+}
 
-        cookie.textContent = "🍪";
+/* GAME */
 
-        cookie.onclick = function() {
+.game-top {
+    max-width: 1050px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
 
-            if(cookie.classList.contains("collected"))
-                return;
+.game-top button {
+    background: white;
+    padding: 10px 17px;
+    border-radius: 20px;
+    font-weight: bold;
+}
 
-            cookie.classList.add("collected");
+.score {
+    background: white;
+    padding: 10px 18px;
+    border-radius: 25px;
+    font-weight: bold;
+}
 
-            setTimeout(() => {
+.instruction {
+    max-width: 900px;
+    margin: 20px auto;
+    background: white;
+    padding: 18px;
+    border-radius: 25px;
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
 
-                cookie.remove();
+.game-area {
+    max-width: 1050px;
+    min-height: 480px;
+    margin: auto;
+    padding: 25px;
+    background: rgba(255,255,255,.95);
+    border-radius: 35px;
+    box-shadow: 0 12px 35px rgba(0,0,0,.1);
+    overflow: hidden;
+}
 
-                const count =
-                    document.getElementById("cookieCount");
+.message {
+    min-height: 40px;
+    margin-top: 15px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
 
-                count.textContent =
-                    Number(count.textContent) - 1;
+/* OBJECTS */
 
-                const eaten =
-                    total -
-                    Number(count.textContent);
+.objects {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    min-height: 160px;
+}
 
-                if(eaten === eat) {
+.object {
+    font-size: 3.3rem;
+    cursor: pointer;
+    user-select: none;
+    touch-action: none;
+    transition: .2s;
+}
 
-                    celebrate(
-                        `🍪 Yummy! ${Number(count.textContent)} cookies are left!`
-                    );
+.object:hover {
+    transform: scale(1.2) rotate(5deg);
+}
 
-                    score += 10;
+.object.dragging {
+    opacity: .5;
+}
 
-                    updateScore();
-                }
+/* BASKET */
 
-            },300);
-        };
+.basket {
+    width: 210px;
+    min-height: 140px;
+    margin: 25px auto;
+    border: 5px dashed #c58b55;
+    border-radius: 25px;
+    background: #ffe5bd;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    transition: .3s;
+}
 
-        cookies.appendChild(cookie);
+.basket.over {
+    transform: scale(1.08);
+    background: #fff0cf;
+}
+
+/* ANIMATION */
+
+.collect {
+    animation: collect .45s forwards;
+}
+
+@keyframes collect {
+    50% {
+        transform: scale(1.5) rotate(15deg);
+    }
+
+    100% {
+        transform: scale(0);
+        opacity: 0;
     }
 }
 
+/* BALLOONS */
 
-/* ==============================
-   5. EQUAL GROUPS
-============================== */
+.balloon-area {
+    min-height: 370px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+}
 
-function equalGroups() {
+.balloon {
+    font-size: 4rem;
+    cursor: pointer;
+    animation: float 1.8s infinite ease-in-out;
+}
 
-    const groups = random(2,4);
-    const each = random(2,5);
-
-    document.getElementById("activityTitle").textContent =
-        "📦 Equal Groups";
-
-    document.getElementById("instruction").textContent =
-        `Make ${groups} groups with ${each} objects in each group.`;
-
-    const area =
-        document.getElementById("playArea");
-
-    area.innerHTML = `
-        <h2 style="text-align:center">
-            ✖️ ${groups} groups × ${each} objects
-        </h2>
-
-        <div class="groups" id="groups"></div>
-
-        <div class="object-row" id="groupObjects"></div>
-    `;
-
-    const groupsArea =
-        document.getElementById("groups");
-
-    for(let i=0;i<groups;i++) {
-
-        const group =
-            document.createElement("div");
-
-        group.className = "group";
-
-        group.innerHTML =
-            `<div class="group-title">
-                Group ${i+1}
-             </div>`;
-
-        group.addEventListener("dragover", e => {
-            e.preventDefault();
-        });
-
-        group.addEventListener("drop", e => {
-
-            e.preventDefault();
-
-            const id =
-                e.dataTransfer.getData("text");
-
-            const item =
-                document.getElementById(id);
-
-            if(!item) return;
-
-            if(group.querySelectorAll(".group-item").length >= each)
-                return;
-
-            item.classList.add("group-item");
-
-            group.appendChild(item);
-
-            checkGroups(groups,each);
-        });
-
-        groupsArea.appendChild(group);
+@keyframes float {
+    0%,100% {
+        transform: translateY(0);
     }
 
-    const objects =
-        document.getElementById("groupObjects");
-
-    for(let i=0;i<groups*each;i++) {
-
-        const item =
-            document.createElement("div");
-
-        item.className = "object";
-
-        item.textContent = "⭐";
-
-        item.draggable = true;
-
-        item.id = "groupItem" + i;
-
-        item.addEventListener("dragstart", e => {
-            e.dataTransfer.setData("text", item.id);
-        });
-
-        objects.appendChild(item);
+    50% {
+        transform: translateY(-18px);
     }
 }
 
+.pop {
+    animation: pop .3s forwards !important;
+}
 
-function checkGroups(groups,each) {
-
-    const all =
-        document.querySelectorAll(".group");
-
-    let complete = true;
-
-    all.forEach(group => {
-
-        if(group.querySelectorAll(".group-item").length !== each) {
-            complete = false;
-        }
-    });
-
-    if(complete) {
-
-        celebrate(
-            `🌟 Perfect! ${groups} groups of ${each}!`
-        );
-
-        score += 15;
-
-        updateScore();
+@keyframes pop {
+    to {
+        transform: scale(2);
+        opacity: 0;
     }
 }
 
+/* GROUPS */
 
-/* ==============================
-   6. PIZZA MAKER
-============================== */
+.groups {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin: 30px 0;
+}
 
-function pizzaMaker() {
+.group {
+    width: 190px;
+    min-height: 160px;
+    padding: 15px;
+    border: 4px dashed #927ee8;
+    border-radius: 25px;
+    background: #f2efff;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    gap: 5px;
+}
 
-    const pizzas = 3;
-    const slices = 4;
+.group-title {
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
 
-    document.getElementById("activityTitle").textContent =
-        "🍕 Pizza Maker";
+/* NUMBER LINE */
 
-    document.getElementById("instruction").textContent =
-        `Put ${slices} slices on each pizza!`;
+.number-line {
+    position: relative;
+    height: 8px;
+    background: #444;
+    margin: 130px auto 80px;
+    max-width: 900px;
+}
 
-    const area =
-        document.getElementById("playArea");
+.number {
+    position: absolute;
+    top: -30px;
+    transform: translateX(-50%);
+    background: transparent;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 5px;
+}
 
-    area.innerHTML = `
-        <div class="groups" id="pizzaGroups"></div>
+.number::after {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 30px;
+    background: #444;
+    top: 30px;
+    left: 50%;
+}
 
-        <div class="object-row" id="pizzaSlices"></div>
-    `;
+.walker {
+    position: absolute;
+    top: -100px;
+    font-size: 4rem;
+    transform: translateX(-50%);
+    transition: left .8s ease;
+}
 
-    const groups =
-        document.getElementById("pizzaGroups");
+/* FISHING */
 
-    for(let i=0;i<pizzas;i++) {
+.fishing {
+    position: relative;
+    min-height: 420px;
+    border-radius: 25px;
+    overflow: hidden;
+    background: linear-gradient(#c7f5ff 55%, #52b9d0 55%);
+}
 
-        const pizza =
-            document.createElement("div");
+.fish {
+    position: absolute;
+    font-size: 2.8rem;
+    cursor: pointer;
+    transition: .3s;
+}
 
-        pizza.className = "group";
+.fish:hover {
+    transform: scale(1.2);
+}
 
-        pizza.innerHTML =
-            `<div class="group-title">
-                🍕 Pizza ${i+1}
-            </div>`;
+/* PATTERN */
 
-        pizza.addEventListener("dragover", e => {
-            e.preventDefault();
-        });
+.pattern {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 80px 0 40px;
+}
 
-        pizza.addEventListener("drop", e => {
+.pattern-item {
+    width: 80px;
+    height: 70px;
+    background: #fff0a8;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
 
-            e.preventDefault();
+.options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
 
-            const id =
-                e.dataTransfer.getData("text");
+.options button {
+    padding: 18px 25px;
+    border-radius: 20px;
+    background: #e4d8ff;
+    font-size: 2rem;
+}
 
-            const slice =
-                document.getElementById(id);
+/* SORTING */
 
-            if(!slice) return;
+.sorting {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
 
-            if(pizza.querySelectorAll(".pizza-item").length >= slices)
-                return;
+.sort-box {
+    width: 230px;
+    min-height: 200px;
+    border: 4px dashed #777;
+    border-radius: 25px;
+    background: #f7f7f7;
+    padding: 15px;
+    text-align: center;
+}
 
-            slice.classList.add("pizza-item");
+.sort-box h3 {
+    margin-top: 0;
+}
 
-            pizza.appendChild(slice);
+.sort-items {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
 
-            checkPizza(pizzas,slices);
-        });
+/* BLOCKS */
 
-        groups.appendChild(pizza);
+.block-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+}
+
+.block-stack {
+    min-height: 190px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 5px;
+}
+
+.block {
+    width: 45px;
+    height: 45px;
+    background: #ff9b72;
+    border: 3px solid #d76544;
+    border-radius: 8px;
+    animation: blockIn .25s;
+}
+
+@keyframes blockIn {
+    from {
+        transform: translateY(-25px);
+        opacity: 0;
     }
 
-    const slicesArea =
-        document.getElementById("pizzaSlices");
-
-    for(let i=0;i<pizzas*slices;i++) {
-
-        const slice =
-            document.createElement("div");
-
-        slice.className = "object";
-
-        slice.textContent = "🍕";
-
-        slice.draggable = true;
-
-        slice.id = "slice" + i;
-
-        slice.addEventListener("dragstart", e => {
-            e.dataTransfer.setData("text",slice.id);
-        });
-
-        slicesArea.appendChild(slice);
+    to {
+        transform: translateY(0);
+        opacity: 1;
     }
 }
 
+/* POPUP */
 
-function checkPizza(pizzas,slices) {
+.popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
 
-    let complete = true;
+.popup.show {
+    display: flex;
+}
 
-    document.querySelectorAll(".group").forEach(group => {
+.popup-box {
+    background: white;
+    padding: 40px;
+    border-radius: 35px;
+    text-align: center;
+    animation: popupIn .4s;
+}
 
-        if(group.querySelectorAll(".pizza-item").length !== slices) {
-            complete = false;
-        }
-    });
+.big-emoji {
+    font-size: 6rem;
+    animation: jump 1s infinite;
+}
 
-    if(complete) {
+.popup-box button {
+    margin-top: 20px;
+    background: #ffd166;
+    padding: 14px 25px;
+    border-radius: 25px;
+    font-weight: bold;
+}
 
-        celebrate(
-            `🍕 Amazing! ${pizzas} × ${slices} = ${pizzas*slices}`
-        );
+@keyframes popupIn {
+    from {
+        transform: scale(.5);
+    }
 
-        score += 15;
-
-        updateScore();
+    to {
+        transform: scale(1);
     }
 }
 
+/* MOBILE */
 
-/* ==============================
-   7. FAIR SHARING
-============================== */
+@media(max-width:800px) {
 
-function fairSharing() {
-
-    const children = 3;
-    const candies = 12;
-
-    document.getElementById("activityTitle").textContent =
-        "🍬 Fair Sharing";
-
-    document.getElementById("instruction").textContent =
-        `Share ${candies} candies equally among ${children} children.`;
-
-    const area =
-        document.getElementById("playArea");
-
-    area.innerHTML = `
-        <div class="groups" id="children"></div>
-
-        <div class="object-row" id="candies"></div>
-    `;
-
-    const childArea =
-        document.getElementById("children");
-
-    for(let i=0;i<children;i++) {
-
-        const child =
-            document.createElement("div");
-
-        child.className = "group";
-
-        child.dataset.count = "0";
-
-        child.innerHTML =
-            `<div class="group-title">
-                ${["👧","👦","👧"][i]}
-                <br>
-                Basket: <span>0</span>
-            </div>`;
-
-        child.addEventListener("dragover", e => {
-            e.preventDefault();
-        });
-
-        child.addEventListener("drop", e => {
-
-            e.preventDefault();
-
-            const id =
-                e.dataTransfer.getData("text");
-
-            const candy =
-                document.getElementById(id);
-
-            if(!candy) return;
-
-            const count =
-                Number(child.dataset.count);
-
-            if(count >= 4) return;
-
-            child.dataset.count =
-                count + 1;
-
-            child.querySelector("span").textContent =
-                count + 1;
-
-            candy.remove();
-
-            checkSharing();
-        });
-
-        childArea.appendChild(child);
+    .hero {
+        flex-direction: column;
+        margin-top: 40px;
     }
 
-    const candyArea =
-        document.getElementById("candies");
+    .hero-girl {
+        font-size: 6rem;
+    }
 
-    for(let i=0;i<candies;i++) {
+    .features {
+        grid-template-columns: repeat(2,1fr);
+    }
 
-        const candy =
-            document.createElement("div");
+    .games {
+        grid-template-columns: repeat(2,1fr);
+    }
 
-        candy.className = "object";
-
-        candy.textContent = "🍬";
-
-        candy.draggable = true;
-
-        candy.id = "candy" + i;
-
-        candy.addEventListener("dragstart", e => {
-            e.dataTransfer.setData("text",candy.id);
-        });
-
-        candyArea.appendChild(candy);
+    .game-top {
+        flex-wrap: wrap;
+        justify-content: center;
     }
 }
 
+@media(max-width:500px) {
 
-function checkSharing() {
+    .games {
+        grid-template-columns: 1fr;
+    }
 
-    const groups =
-        document.querySelectorAll("#children .group");
+    .features {
+        grid-template-columns: 1fr 1fr;
+    }
 
-    let correct = true;
+    .game-area {
+        padding: 15px;
+    }
 
-    groups.forEach(group => {
-
-        if(Number(group.dataset.count) !== 4) {
-            correct = false;
-        }
-    });
-
-    if(correct) {
-
-        celebrate(
-            "🎉 Perfect sharing! 12 ÷ 3 = 4"
-        );
-
-        score += 20;
-
-        updateScore();
+    .object {
+        font-size: 2.7rem;
     }
 }
-
-
-/* ==============================
-   8. BUNNY CARROTS
-=============
